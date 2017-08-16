@@ -22,9 +22,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import org.apache.ignite.Ignite;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.internal.IgniteEx;
+import org.apache.ignite.internal.IgnitionEx;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.TcpDiscoveryIpFinder;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder;
@@ -268,6 +270,19 @@ public class JdbcConnectionSelfTest extends GridCommonAbstractTest {
                 SQLException.class,
                 "Connection is closed."
             );
+        }
+    }
+
+    /**
+     * @throws Exception If failed.
+     */
+    public void testReopenSameInstance() throws Exception {
+        String url = CFG_URL_PREFIX + configURL();
+
+        try (Ignite ignite = IgnitionEx.start(configURL())) {
+            try (Connection conn = DriverManager.getConnection(url)) {
+                assertNotNull(conn);
+            }
         }
     }
 
